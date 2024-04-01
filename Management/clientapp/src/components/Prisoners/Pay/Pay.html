@@ -1,0 +1,177 @@
+﻿
+
+<div class="container-fluid py-4 formInfo"  dir="rtl" style="height: 1000px;">
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="multisteps-form mb-12">
+                <div class="row">
+                    <div class="col-12 col-lg-12 m-auto">
+                        <el-form :model="ruleForm"
+                                 :rules="rules"
+                                 ref="ruleForm"
+                                 class="multisteps-form__form mb-8">
+
+                            <div class="card multisteps-form__panel p-3 border-radius-xl bg-white js-active"
+                                 data-animation="FadeIn">
+                                <h5 class="font-weight-bolder mb-0">صرف مستحقات الاسري </h5>
+                                <p class="mb-0 text-sm" style="margin-top: 7px;">الرجاء التأكد من ادخال جميع العمليات الخاصة بعملية الصرف    </p>
+
+                                <div class="multisteps-form__content">
+
+                                    <!--Personal Info-->
+                                    <div class="row" style="margin-top: 98px; margin-bottom: 25px;">
+                                        <el-divider content-position="right"><h4>بيانات إحصائية   </h4></el-divider>
+                                    </div>
+
+                                    <div class="row">
+                                        <el-row :gutter="20">
+                                            <el-col :span="12">
+                                                <div class="grid-content bg-purple">
+                                                    <h6>
+                                                        عدد الأيام المتبقية لجميع الأسري : {{Info.prisonersDayRemindCount}}
+                                                    </h6>
+                                                </div>
+                                            </el-col>
+                                            <el-col :span="12">
+                                                <div class="grid-content bg-purple">
+                                                    <h6>
+                                                        عدد الأسري المستمرين : {{Info.prisonersCount}}
+                                                    </h6>
+                                                </div>
+                                            </el-col>
+                                        </el-row>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <el-row :gutter="20">
+                                            <el-col :span="8">
+                                                <div class="grid-content bg-purple">
+                                                    <h6>
+                                                        أسري لديهم أيام أكتر من 120 يوم  : {{Info.prisonersDayRemindCountMore120}}
+                                                    </h6>
+                                                </div>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <div class="grid-content bg-purple">
+                                                    <h6>
+                                                        أسري لديهم أيام أكتر من 60 يوم  : {{Info.prisonersDayRemindCountMore60}}
+                                                    </h6>
+                                                </div>
+                                            </el-col>
+                                            <el-col :span="8">
+                                                <div class="grid-content bg-purple">
+                                                    <h6>
+                                                        أسري لديهم أيام أكتر من 30 يوم  : {{Info.prisonersDayRemindCountMore30}}
+                                                    </h6>
+                                                </div>
+                                            </el-col>
+                                        </el-row>
+                                    </div>
+
+
+
+                                    <!--Personal Info-->
+                                    <div class="row" style="margin-top: 98px; margin-bottom: 25px;">
+                                        <el-divider content-position="right"><h4>بيانات عملية الصرف   </h4></el-divider>
+                                        <p style="margin-right:24px"><span style="color:red">*</span>  ملاحظة : قيم الإحتساب تعتبر مبدئية قد تختلف في حال كان احد الاسري قد إستوفي القيمة الخاصه به ويمكن معرفة البيانات الحقيقية بعد عمليةالصرف </p>
+
+                                    </div>
+
+
+                                    <div class="row">
+
+                                        <div class="col-md-4">
+                                            <el-form-item label=" وصف عملية الصرف" prop="Descriptions">
+                                                <input v-model="ruleForm.Descriptions"
+                                                       class="multisteps-form__input form-control" type="text"
+                                                       placeholder="وصف عملية الصرف " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <el-form-item label=" القيمة المسموح بها في عملية الصرف" prop="MaxValue">
+                                                <input v-model="ruleForm.MaxValue"
+                                                       class="multisteps-form__input form-control" type="number"
+                                                       placeholder="القيمة " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <el-form-item label=" قيمة اليوم" prop="PriceOfDay">
+                                                <input v-model="ruleForm.PriceOfDay"
+                                                       class="multisteps-form__input form-control" type="number"
+                                                       placeholder="القيمة " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+
+                                        <div class="col-md-2" dir="ltr">
+
+                                            <el-button type="primary" @click.prevent="CalculatInfo()" style="margin-top:50px" plain>احتساب</el-button>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <!--{{ruleForm}}-->
+                                        <div class="col-md-3">
+                                            <el-form-item label=" عدد الاسري المشمولين في عملية الصرف">
+                                                <input v-model="ruleForm.PrisonersCount"
+                                                       class="multisteps-form__input form-control" type="number"
+                                                       disabled
+                                                       placeholder="القيمة " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <el-form-item label=" القيمة التي ستمنح لكل اسير">
+                                                <input v-model="ruleForm.valueOfPay"
+                                                       class="multisteps-form__input form-control" type="number"
+                                                       disabled
+                                                       placeholder="القيمة " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <el-form-item label=" عدد الايام لكل اسير">
+                                                <input v-model="ruleForm.valueOfDay"
+                                                       class="multisteps-form__input form-control" type="number"
+                                                       disabled
+                                                       placeholder="القيمة " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <el-form-item label=" عدد الساعات">
+                                                <input v-model="ruleForm.valueOfHour"
+                                                       class="multisteps-form__input form-control" type="number"
+                                                       disabled
+                                                       placeholder="القيمة " onfocus="focused(this)"
+                                                       onfocusout="defocused(this)">
+                                            </el-form-item>
+                                        </div>
+
+                                    </div>
+
+
+                                    <!--Button Info-->
+                                    <div class="row" style="margin-top:25px">
+                                        <div class="col-12 col-sm-12" style="text-align:left">
+                                            <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="button"
+                                                    title="Next"
+                                                    @click.prevent="submitForm('ruleForm')">
+                                                صرف القيمة 
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,365 @@
+﻿<div class="container-fluid py-4" dir="rtl">
+    <div class="row" v-if="state==0">
+        <div class="col-12">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header pb-0">
+                    <div class="d-lg-flex">
+                        <div>
+                            <h5 class="font-weight-bolder mb-0">متابعة حركات حسابات الاسري    </h5>
+                            <p class="mb-0 text-sm" style="margin-top: 7px;">قائمة بجميع حركات حسابات الاسري  داخل النظام   </p>
+                        </div>
+                        <div class="ms-auto my-auto mt-lg-0 mt-4">
+                            <div class="ms-auto my-auto">
+
+                                <button style="margin: 10px;" type="button" @click="Refresh()"
+                                        class="btn btn-outline-warning btn-sm mb-0">
+                                    تحديث
+                                </button>
+
+                                <!--<button style="margin: 10px;" type="button" @click="AddDialog=true"
+                            class="btn btn-outline-primary btn-sm mb-0">
+                        تقديم طلب انتقال جديد
+                    </button>-->
+                                <!--<button style="margin: 10px;" type="button" @click="Print()"
+                            class="btn btn-outline-primary btn-sm mb-0">
+                        طباعة البيانات
+                    </button>-->
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-3 px-3" v-if="loginDetails.userType == 1">
+                    <div class="col-md-2">
+                        <div class="form-group bmd-form-group">
+                            <el-select style="width: 100%;"
+                                       v-model="CityId"
+                                       filterable
+                                       placeholder="المدينة"
+                                       @change="GetMunicipalitiesInfo()">
+                                <el-option v-for="item in Cities"
+                                           :key="item.id"
+                                           :label="item.name"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <el-select v-model="MunicipalitiesId"
+                                   style="width:100%;"
+                                   @change="GetOfficesInfo()"
+                                   filterable
+                                   placeholder="البلديات">
+                            <el-option v-for="item in Municipalities"
+                                       :key="item.id"
+                                       :label="item.name"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group bmd-form-group">
+                            <el-select @change="GetInfo()"
+                                       v-model="OfficeId"
+                                       filterable
+                                       placeholder="المركز الخدمي ">
+                                <el-option v-for="item in Offices"
+                                           :key="item.id"
+                                           :label="item.name"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-3 px-3">
+
+                    <div class="col-md-3">
+                        <div class="form-group bmd-form-group">
+                            <label> البحت عن طريق الرقم الوطني </label>
+                            <el-select v-model="PrisonersId"
+                                       id="selectInputNid"
+                                       :remote-method="FilterByNid"
+                                       remote
+                                       reserve-keyword
+                                       style="width:100%"
+                                       filterable placeholder="الرقم الوطني "
+                                       @change="GetInfo()">
+                                <el-option v-for="item in Prisoners"
+                                           :key="item.id"
+                                           :label="item.nid"
+                                           :value="item.id">
+                                    <span style="float: right">{{ item.nid }}</span>
+                                    <span style="float: left; color: #8492a6; font-size: 13px">{{ item.name }}</span>
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group bmd-form-group">
+                            <label> البحت عن طريق جواز السفر </label>
+                            <el-select v-model="PrisonersId"
+                                       id="selectInputPass"
+                                       :remote-method="FilterByPass"
+                                       remote
+                                       reserve-keyword
+                                       style="width:100%"
+                                       filterable placeholder="رقم جواز السفر "
+                                       @change="GetInfo()">
+                                <el-option v-for="item in Prisoners"
+                                           :key="item.id"
+                                           :label="item.passport"
+                                           :value="item.id">
+                                    <span style="float: right">{{ item.passport }}</span>
+                                    <span style="float: left; color: #8492a6; font-size: 13px">{{ item.name }}</span>
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group bmd-form-group">
+                            <label> فلترة النتائج بالحالة  </label>
+                            <el-select @change="GetInfo()" v-model="PrisonerStatus" filterable
+                                       placeholder="الحاله">
+                                <el-option v-for="item in [{id:1,name:'مستمر'},{id:2,name:'مستوفي القيمة'}]"
+                                           :key="item.id"
+                                           :label="item.name"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+
+                    </div>
+                    <div class="col-md-1">
+                        <div class="dataTable-top">
+                            <el-select v-model="pageSize"
+                                       @change="GetInfo()"
+                                       filterable
+                                       style=" width: 130%;margin-top:25px ">
+                                <el-option v-for="item in [{id:5,name:'5'},
+                                                           {id:10,name:'10'},
+                                                           {id:20,name:'20'},
+                                                           {id:40,name:'40'},
+                                                           {id:80,name:'80'},
+                                                           {id:100,name:'100'},
+                                                           {id:200,name:'200'},
+                                                           {id:400,name:'400'},
+                                           ]"
+                                           :key="item.id"
+                                           :label="item.name"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+
+                <!--{{Info}}-->
+                <el-alert style="margin-top:40px"
+                          v-if="Info==0"
+                          title="عذرا لاتــوجد بيـــانـــات لـعـرضــهــا !!!"
+                          type="info"
+                          center
+                          :closable="false"
+                          show-icon>
+                </el-alert>
+                <div class="card-body px-0 pb-0">
+                    <div class="table-responsive">
+                        <div class="dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns">
+                            <div class="dataTable-container" v-if="Info!=0">
+                                <table class="table table-flush dataTable-table" id="products-list">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>
+                                                <a href="#">#</a>
+                                            </th>
+                                            <th>
+                                                <a> الإسم الرباعي</a>
+                                            </th>
+                                            <th>
+                                                <a> الرقم الوطني </a>
+                                            </th>
+                                            <th v-if="loginDetails.userType == 1">
+                                                <a>  المركظ الخدمي </a>
+                                            </th>
+                                            <th>
+                                                <a> وصف عملية الصرف</a>
+                                            </th>
+                                            <th>
+                                                <a>  تاريخ عملية الصرف</a>
+                                            </th>
+                                            <th>
+                                                <a> عدد الايام  </a>
+                                            </th>
+                                            <th>
+                                                <a>  قيمة اليوم  </a>
+                                            </th>
+                                            <th>
+                                                <a>  قيمة الساعة  </a>
+                                            </th>
+                                            <th>
+                                                <a> عدد الايام الكلي للاسير </a>
+                                            </th>
+                                            <th>
+                                                <a> عدد الايام المتبقية </a>
+                                            </th>
+                                            <th>
+                                                <a> منفذ العملية</a>
+                                            </th>
+                                            <th>
+                                                <a> الحالة</a>
+                                            </th>
+                                            <th>
+                                                <a> تاريخ الادراج</a>
+                                            </th>
+                                            <!--<th style="text-align:left">
+                                    <a> الإعدادات</a>
+                                </th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item,index in Info">
+                                            <td class="text-sm">
+                                                {{index+1}}
+                                            </td>
+                                            <td class="text-sm">
+                                                <div class="d-flex">
+                                                    <img class="avatar avatar-sm me-3" :src="item.image" alt="avatar image">
+                                                    <h6 class="ms-3 my-auto">{{item.name}}</h6>
+                                                </div>
+                                            </td>
+                                            <td class="text-sm">
+                                                {{item.nid}}
+                                            </td>
+
+                                            <td class="text-sm" v-if="loginDetails.userType == 1">
+                                                {{item.officeName}}
+                                            </td>
+
+                                            <td class="text-sm">
+                                                {{item.descriptions}}
+                                            </td>
+                                            <td class="text-sm">
+                                                {{item.payOn | moment}}
+                                            </td>
+
+                                            <td class="text-sm">
+                                                {{item.countOfDay}}
+                                            </td>
+                                            <td class="text-sm">
+                                                {{item.priceForDay}}
+                                            </td>
+                                            <td class="text-sm">
+                                                {{item.priceForOur}}
+                                            </td>
+
+
+                                            <td class="text-sm">
+                                                {{item.pCountOfDay}}
+                                            </td>
+                                            <td class="text-sm">
+                                                {{item.countOfDayRemind}}
+                                            </td>
+
+                                            <td class="text-sm">
+                                                {{item.createdBy}}
+                                            </td>
+
+                                            <td class="text-sm">
+                                                <el-tag type="success" v-if="item.status==1">مستمر</el-tag>
+                                                <el-tag type="danger" v-if="item.status==2">مستوفي الفيمة</el-tag>
+                                            </td>
+
+                                            <td class="text-sm">
+                                                {{item.createdOn | moment}}
+                                            </td>
+
+                                            <!--<td class="text-sm" style="text-align:left">
+
+                                    <a href="#"
+                                       @click.prevent="showPrisoners(item)"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-original-title="Preview product">
+                                        <i class="fas fa-eye text-secondary" aria-hidden="true"></i>
+                                    </a>
+
+                                    <a href="#"
+                                       class="mx-3"
+                                       @click.prevent="OpenEditDilaog(item)"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-original-title="Preview product">
+                                        <i class="fas fa-edit text-secondary" aria-hidden="true"></i>
+                                    </a>
+
+                                    <a href="#"
+                                       @click.prevent="OpenAttachmentDilaog(item)"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-original-title="Preview product">
+                                        <i class="fas fa-file text-secondary" aria-hidden="true"></i>
+                                    </a>
+
+                                    <a href="#"
+                                       class="mx-3"
+                                       @click.prevent="OpenScheduleDilaog(item)"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-original-title="Preview product">
+                                        <i class="fa fa-calendar-o text-secondary" aria-hidden="true"></i>
+                                    </a>
+
+                                    <a href="#"
+                                       @click.prevent="Delete(item.id)"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-original-title="Preview product">
+                                        <i class="fas fa-trash text-secondary" aria-hidden="true"></i>
+                                    </a>
+                                </td>-->
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <el-divider></el-divider>
+                                <div style="text-align: left; margin-left: 50px;margin-top: 20px;">
+                                    ....     Showing
+                                    <span style="font-weight:bold;">{{Info.length}}</span>
+                                    of
+                                    <span style="font-weight:bold;">{{pages}}</span>
+                                </div>
+                                <div style="text-align: center;padding-bottom:11px">
+                                    <el-pagination background
+                                                   layout="prev, pager, next"
+                                                   :current-page="pageNo"
+                                                   :page-size="pageSize"
+                                                   :total="pages"
+                                                   @current-change="GetInfo($event)">
+                                    </el-pagination>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>

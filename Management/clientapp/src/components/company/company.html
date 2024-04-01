@@ -1,0 +1,292 @@
+﻿<div class="container-fluid py-4" dir="rtl">
+    <div class="row" v-if="state==0">
+        <div class="col-12">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header pb-0">
+                    <div class="d-lg-flex">
+                        <div>
+                            <h5 class="font-weight-bolder mb-0">إدارة بيانات الشركات </h5>
+                            <p class="mb-0 text-sm" style="margin-top: 7px;">قائمة بجميع الشركات المعتمدة  داخل النظام  </p>
+                        </div>
+                        <div class="ms-auto my-auto mt-lg-0 mt-4">
+                            <div class="ms-auto my-auto">
+
+                                <button style="margin: 10px;" type="button" @click="Refresh()"
+                            class="btn btn-outline-warning btn-sm mb-0">
+                        تحديث
+                    </button>
+                                <!--<button style="margin: 10px;" type="button" @click="OpenAddDialog()"
+                            class="btn btn-outline-primary btn-sm mb-0">
+                        إضافة شركة جديدة
+                    </button>-->
+                                <!--<button style="margin: 10px;" type="button" @click="Print()"
+                            class="btn btn-outline-primary btn-sm mb-0">
+                        طباعة البيانات
+                    </button>-->
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row mt-3 px-3">
+                    <div class="col-md-4" v-if="loginDetails.userType == 1">
+                        <div class="form-group bmd-form-group">
+                            <label> فلترة  برقم التسجيل  </label>
+                            <el-select style="width: 100%;"
+                                       v-model="ReceiptNumber"
+                                       filterable
+                                       placeholder="رقم التسجيل"
+                                       @change="GetInfo()">
+                                <el-option v-for="item in Companies"
+                                           :key="item.id"
+                                           :label="item.receiptNumber"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    
+                    <!--<div class="col-md-3" v-if="loginDetails.userType == 1">
+            <div class="form-group bmd-form-group">
+                <label> فلترة النتائج  المركز الخدمي  </label>
+                <el-select @change="GetInfo()"
+                           v-model="OfficeId"
+                           filterable
+                           placeholder="المركز الخدمي">
+                    <el-option v-for="item in Offices"
+                               :key="item.id"
+                               :label="item.name"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </div>
+        </div>
+        <div class="col-md-2" v-if="loginDetails.userType == 1">
+            <div class="form-group bmd-form-group">
+                <label> فلترة النتائج بنوع الحساب  </label>
+                <el-select @change="GetInfo()"
+                           v-model="UserType" filterable
+                           placeholder="نوع الحساب">
+                    <el-option v-for="item in [{id:1,name:'مدير'},{id:2,name:'موظف'},{id:3,name:'مراقب'}]"
+                               :key="item.id"
+                               :label="item.name"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </div>
+        </div>-->
+                 
+                </div>
+                
+                <!--{{Info}}-->
+                <el-alert style="margin-top:40px"
+                          v-if="Info==0"
+                          title="عذرا لاتــوجد بيـــانـــات لـعـرضــهــا !!!"
+                          type="info"
+                          center
+                          :closable="false"
+                          show-icon>
+                </el-alert>
+                <div class="card-body px-0 pb-0">
+                    <div class="table-responsive">
+                        <div class="dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns">
+                            <div class="dataTable-container" v-if="Info!=0">
+                                <table class="table table-flush dataTable-table" id="products-list">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>
+                                                <a href="#">#</a>
+                                            </th>
+                                            <th>
+                                                <a> رقم التسجيل</a>
+                                            </th>
+                                            <th>
+                                                <a> إسم الشركة</a>
+                                            </th>
+                                            <th>
+                                                <a> رقم الهاتف</a>
+                                            </th>
+                                            <th>
+                                                <a>البريد الإلكتروني</a>
+                                            </th>
+                                            <th>
+                                                <a> العنوان</a>
+                                            </th>
+                                            <th>
+                                                <a> اسم المفوض</a>
+                                            </th>
+
+                                            <th>
+                                                <a> حالة الشركة</a>
+                                            </th>
+                                            <th>
+                                                <a> الاعدادات</a>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item,index in Info">
+                                            <td class="text-sm">{{index+1}} </td>
+                                            <td class="text-sm">{{item.receiptNumber}}</td>
+                                            <td class="text-sm">{{item.name}}</td>
+                                            <td class="text-sm">{{item.phone}}</td>
+                                            <td class="text-sm">{{item.email}}</td>
+                                            <td class="text-sm">{{item.address}}</td>
+                                            <td class="text-sm">{{item.ownerName}}</td>
+                                            <td class="text-sm">
+                                                <el-tag type="warning" v-if="item.levels==1">تم التسجيل</el-tag>
+                                                <el-tag type="warning" v-if="item.levels==2">مطابق </el-tag>
+                                                <el-tag type="success" v-if="item.levels==3">مفعل </el-tag>
+
+                                            </td>
+                                            <td class="text-sm">
+                                                <a href="#" v-if="item.levels==1"
+                                                   title="مطابقة البيانات "
+                                                   @click.prevent="CahngeLevels(item.id)"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-original-title="Preview product">
+                                                    <i class="fa fa-check-square-o text-danger" aria-hidden="true"></i>
+                                                </a>
+                                                <a href="#" v-if="item.levels==2"
+                                                   class="mx-3"
+                                                   title="تفعيل شركة "
+                                                   @click.prevent="Active(item.id)"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-original-title="Preview product">
+                                                    <i class="fa fa-refresh text-secondary" aria-hidden="true"></i>
+                                                </a>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <el-divider></el-divider>
+                                <div style="text-align: left; margin-left: 50px;margin-top: 20px;">
+                                    ....     Showing
+                                    <span style="font-weight:bold;">{{Info.length}}</span>
+                                    of
+                                    <span style="font-weight:bold;">{{pages}}</span>
+                                </div>
+                                <div style="text-align: center;padding-bottom:11px">
+                                    <el-pagination background
+                                                   layout="prev, pager, next"
+                                                   :current-page="pageNo"
+                                                   :page-size="pageSize"
+                                                   :total="pages"
+                                                   @current-change="GetInfo($event)">
+                                    </el-pagination>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <!--New Request-->
+                <el-dialog title="إضافة شركة جديدة"
+                           :visible.sync="AddDialog"
+                           width="50%"
+                           center>
+                    <div class="row">
+                        <el-form label-position="top"
+                                 :model="ruleForm"
+                                 :rules="rules"
+                                 ref="ruleForm"
+                                 label-width="120px"
+                                 class="demo-ruleForm"
+                                 style="width: 100%;">
+                            <br />
+
+
+                            <!--{{SelectedItem}}-->
+
+                            <div class="row" dir="rtl">
+                                <div class="col-md-12">
+                                    <div class="form-group align-right">
+                                        <el-form-item label=" اسم الشركة " prop="Name">
+                                            <el-input type="text" v-model="ruleForm.Name" placeholder="إسم الشركة"></el-input>
+                                        </el-form-item>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+
+                            <div class="row" dir="rtl">
+
+                                <div class="col-md-12" style="direction: ltr;text-align: left">
+                                    <button class="btn btn-info"
+                                            style="margin-top: 17px;margin-left: 21px;"
+                                            @click.prevent="submitForm('ruleForm')">
+                                        إضافة بيانات الشركة
+                                    </button>
+                                </div>
+                            </div>
+                            <br />
+
+                        </el-form>
+                    </div>
+
+                </el-dialog>
+
+
+                <!--Edit Request-->
+                <el-dialog title="تعديل بيانات شركة جديدة"
+                           :visible.sync="EditDialog"
+                           width="50%"
+                           center>
+                    <div class="row">
+                        <el-form label-position="top"
+                                 :model="ruleForm"
+                                 :rules="rules"
+                                 ref="ruleForm"
+                                 label-width="120px"
+                                 class="demo-ruleForm"
+                                 style="width: 100%;">
+                            <br />
+
+                            <div class="row" dir="rtl">
+                                <div class="col-md-12">
+                                    <div class="form-group align-right">
+                                        <el-form-item label=" اسم الشركة " prop="Name">
+                                            <el-input type="text" v-model="ruleForm.Name" placeholder="إسم الشركة"></el-input>
+                                        </el-form-item>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+
+                            <div class="row" dir="rtl">
+
+                                <div class="col-md-12" style="direction: ltr;text-align: left">
+                                    <button class="btn btn-info"
+                                            style="margin-top: 17px;margin-left: 21px;"
+                                            @click.prevent="submitEditForm('ruleForm')">
+                                        تعديل بيانات الشركة
+                                    </button>
+                                </div>
+                            </div>
+                            <br />
+
+                        </el-form>
+                    </div>
+
+                </el-dialog>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>

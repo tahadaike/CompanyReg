@@ -1,0 +1,19 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/ScreenControl/v16/Server/sqlite3
+
+/Publish
+estbian.sql
+back 04.10.2022.sql
+back 06.10.2022.sql
+ex.sql
+PublishedV.sql
+/PulbishHestory
+sql.sql
+/Resurse/Data
+/Resuse
+RedaSql.sql
+Resurse
+26.07.2023.sql

@@ -1,0 +1,171 @@
+﻿<div class="container-fluid py-4" dir="rtl">
+    <div class="row" v-if="state==0">
+        <div class="col-12">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header pb-0">
+                    <div class="d-lg-flex">
+                        <div>
+                            <h5 class="font-weight-bolder mb-0">سجل العمليات علي النظام </h5>
+                        </div>
+                        <div class="ms-auto my-auto mt-lg-0 mt-4">
+                            <div class="ms-auto my-auto">
+
+                                <!--<button style="margin: 10px;" type="button" @click="Refresh()"
+                            class="btn btn-outline-warning btn-sm mb-0">
+                        تحديث
+                    </button>-->
+                                <!--<button style="margin: 10px;" type="button" @click="OpenAddDialog()"
+                            class="btn btn-outline-primary btn-sm mb-0">
+                        إضافة شركة جديدة
+                    </button>-->
+                                <!--<button style="margin: 10px;" type="button" @click="Print()"
+                            class="btn btn-outline-primary btn-sm mb-0">
+                        طباعة البيانات
+                    </button>-->
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <br />
+                <br />
+                <br />
+                <!--{{Info}}-->
+                <el-alert style="margin-top:40px"
+                          v-if="Info==0"
+                          title="عذرا لاتــوجد بيـــانـــات لـعـرضــهــا !!!"
+                          type="info"
+                          center
+                          :closable="false"
+                          show-icon>
+                </el-alert>
+                <div class="card-body px-0 pb-0">
+                    <div class="table-responsive">
+                        <div class="dataTable-wrapper dataTable-loading no-footer sortable searchable fixed-columns">
+                            <div class="dataTable-container" v-if="Info!=0">
+                                <table class="table table-flush dataTable-table" id="products-list">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>
+                                                <a href="#">#</a>
+                                            </th>
+                                            <th>
+                                                <a> نوع العملية</a>
+                                            </th>
+                                            <th>
+                                                <a> وصف العملية</a>
+                                            </th>
+                                            <th>
+                                                <a>الجدول</a>
+                                            </th>
+                                            <th>
+                                                <a>رقم السجل</a>
+                                            </th>
+                                            <th>
+                                                <a> منفد العملية</a>
+                                            </th>
+                                        
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item,index in Info">
+                                            <td class="text-sm">{{index+1}} </td>
+                                            <td class="text-sm">{{item.operations}}</td>
+                                            <td class="text-sm">{{item.descriptions}}</td>
+                                            <td class="text-sm">{{item.controller}}</td>
+                                            <td class="text-sm">{{item.itemId}}</td>
+                                            <td class="text-sm">{{item.createdBy}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <el-divider></el-divider>
+                                <div style="text-align: left; margin-left: 50px;margin-top: 20px;">
+                                    ....     Showing
+                                    <span style="font-weight:bold;">{{Info.length}}</span>
+                                    of
+                                    <span style="font-weight:bold;">{{pages}}</span>
+                                </div>
+                                <div style="text-align: center;padding-bottom:11px">
+                                    <el-pagination background
+                                                   layout="prev, pager, next"
+                                                   :current-page="pageNo"
+                                                   :page-size="pageSize"
+                                                   :total="pages"
+                                                   @current-change="GetInfo($event)">
+                                    </el-pagination>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <!--Issuse Request-->
+                <el-dialog title="إضافة مخالفة جديدة"
+                           :visible.sync="AddDialog"
+                           width="50%"
+                           center>
+                    <div class="row">
+                        <el-form label-position="top"
+                                 :model="ruleForm"
+                                 :rules="rules"
+                                 ref="ruleForm"
+                                 label-width="120px"
+                                 class="demo-ruleForm"
+                                 style="width: 100%;">
+                            <br />
+
+                            <div class="row" dir="rtl">
+                                <div class="col-md-6">
+                                    <div class="form-group align-right">
+                                        <el-form-item label=" اسم المخافة " prop="Name">
+                                            <el-input type="text" v-model="ruleForm.Name" placeholder="إسم المخافة"></el-input>
+                                        </el-form-item>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group align-right">
+                                        <el-form-item label=" سبب المخافة " prop="Resone">
+                                            <el-input type="text" v-model="ruleForm.Resone" placeholder="سبب المخافة"></el-input>
+                                        </el-form-item>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                            <br />
+
+
+                            <div class="row" dir="rtl">
+
+                                <div class="col-md-12" style="direction: ltr;text-align: left">
+                                    <button class="btn btn-info"
+                                            style="margin-top: 17px;margin-left: 21px;"
+                                            @click.prevent="submitForm('ruleForm')">
+                                        إضافة مخافة
+                                    </button>
+                                </div>
+                            </div>
+                            <br />
+
+                        </el-form>
+                    </div>
+
+                </el-dialog>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
